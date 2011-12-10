@@ -1,5 +1,5 @@
-Relish: Python Object Serialization
-===================================
+Relish: Tasty Python Object Serialization
+=========================================
 
 Serialize your python objects into tasty (human-readable) formats.
 
