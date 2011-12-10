@@ -124,7 +124,7 @@ class TestComplexObjects(unittest.TestCase):
         self.assertEqual(s, self.serialized_request)
 
     def test_real_world_deserialization(self):
-        o = jsonify.deserialize(self.request, self.AuthRequest)
+        o = jsonify.deserialize(self.serialized_request, self.AuthRequest)
         self.assertTrue(isinstance(o, self.AuthRequest))
         self.assertTrue(isinstance(o.credentials, self.AuthRequest.Credentials))
         self.assertEqual(o.credentials.username, 'joeuser')

@@ -70,7 +70,13 @@ def _dict_to_obj(d, cls):
     """Populate an obj with values from a dictionary."""
     obj = cls()
 
-    for attr in d.keys():
-        setattr(obj, attr, d[attr])
-
+    for attr in dir(obj):
+        # avoid private attributes
+        if attr[0] != '_':
+            value = getattr(obj, attr)
+            if hasattr(value, '_relish'):
+                raise NotImplementedError
+            elif not callable(value):
+                # normal attribute
+                setattr(obj, attr, d[attr])
     return obj
