@@ -4,7 +4,7 @@ from relish.serializers import dummify
 from relish.serializers import jsonify
 from relish.decorators import relish
 
-class DummySerializerTests(unittest.TestCase):
+class TestDummySerializer(unittest.TestCase):
     def test_dummy_serializer(self):
         self.assertEquals(dummify.serialize(object()), str())
 
@@ -12,7 +12,7 @@ class DummySerializerTests(unittest.TestCase):
         self.assertTrue(isinstance(dummify.deserialize(str()), object))
 
 
-class JsonSerializerTests(unittest.TestCase):
+class TestJsonSerializer(unittest.TestCase):
     class Klass():
         _private = 1
 
@@ -44,7 +44,7 @@ class JsonSerializerTests(unittest.TestCase):
         self.assertEquals(o.things, ["a", 2, "three"])
 
 
-class DecoratorTests(unittest.TestCase):
+class TestDecorators(unittest.TestCase):
     @relish(name='class')
     @relish(attribute={'name': 'value'})
     class Klass():
@@ -56,7 +56,7 @@ class DecoratorTests(unittest.TestCase):
         self.assertEqual(self.o._relish, {'name': 'class', 'attribute': {'name': 'value'}})
 
 
-class DecoratorNameHintTests(unittest.TestCase):
+class TestDecoratorNameHints(unittest.TestCase):
     class Klass():
         attribute = None
 
@@ -93,3 +93,39 @@ class DecoratorNameHintTests(unittest.TestCase):
         o = jsonify.deserialize(s, self.Named)
         self.assertTrue(isinstance(o, self.Named))
         self.assertEquals(o.attribute, 4)
+
+
+class TestComplexObjects(unittest.TestCase):
+    """Example based on POST /tokens from
+
+    See: http://keystone.openstack.org/adminAPI_curl_examples.html"""
+
+    @relish(name="auth")
+    class AuthRequest():
+        credentials = None
+
+        def __init__(self, *args, **kwargs):
+            self.credentials = self.Credentials(*args, **kwargs)
+
+        @relish(name="passwordCredentials")
+        class Credentials():
+            username = None
+            password = None
+
+            def __init__(self, username=None, password=None, *args, **kwargs):
+                self.username = username
+                self.password = password
+
+    request = AuthRequest(username='joeuser', password='secrete')
+    serialized_request = '{"auth": {"passwordCredentials": {"username": "joeuser", "password": "secrete"}}}'
+
+    def test_real_world_serialization(self):
+        s = jsonify.serialize(self.request)
+        self.assertEqual(s, self.serialized_request)
+
+    def test_real_world_deserialization(self):
+        o = jsonify.deserialize(self.request, self.AuthRequest)
+        self.assertTrue(isinstance(o, self.AuthRequest))
+        self.assertTrue(isinstance(o.credentials, self.AuthRequest.Credentials))
+        self.assertEqual(o.credentials.username, 'joeuser')
+        self.assertEqual(o.credentials.password, 'secrete')
