@@ -20,7 +20,12 @@ def _unwrap_dict(d, cls):
     return d.get(cls.__name__.lower())
 
 def _obj_to_dict(obj):
-    d = dict([(attr, getattr(obj, attr)) for attr in dir(obj) if attr[0] != '_'])
+    d = dict()
+    for attr in dir(obj):
+        if True and \
+                attr[0] != '_' and \
+                not callable(getattr(obj, attr)):
+            d[attr] = getattr(obj, attr)
     return d
 
 def _dict_to_obj(d, cls):
