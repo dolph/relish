@@ -52,15 +52,27 @@ class DecoratorTests(unittest.TestCase):
 
     o = Klass()
 
-    @relish(name=None)
-    class Nameless():
+    def test_class_decorator(self):
+        self.assertEqual(self.o._relish, {'name': 'class', 'attribute': {'name': 'value'}})
+
+
+class DecoratorNameHintTests(unittest.TestCase):
+    class Klass():
         attribute = None
+
+    @relish(name=None)
+    class Nameless(Klass):
+        pass
 
     anon = Nameless()
     anon.attribute = 7
 
-    def test_class_decorator(self):
-        self.assertEqual(self.o._relish, {'name': 'class', 'attribute': {'name': 'value'}})
+    @relish(name='specialName')
+    class Named(Klass):
+        pass
+
+    named = Named()
+    named.attribute = 4
 
     def test_serializing_unwrapped_class(self):
         s = jsonify.serialize(self.anon)
@@ -71,3 +83,13 @@ class DecoratorTests(unittest.TestCase):
         o = jsonify.deserialize(s, self.Nameless)
         self.assertTrue(isinstance(o, self.Nameless))
         self.assertEquals(o.attribute, 7)
+
+    def test_serializing_custom_wrapped_class(self):
+        s = jsonify.serialize(self.named)
+        self.assertEquals(s, '{"specialName": {"attribute": 4}}')
+
+    def test_deserializing_custom_wrapped_class(self):
+        s = '{"specialName": {"attribute": 4}}'
+        o = jsonify.deserialize(s, self.Named)
+        self.assertTrue(isinstance(o, self.Named))
+        self.assertEquals(o.attribute, 4)

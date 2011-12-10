@@ -20,9 +20,6 @@ def _get_wrapper_name(cls):
     else:
         name = cls.__name__.lower()
 
-    if name:
-        name.lower()
-
     return name
 
 def _wrap_dict(obj, d):
