@@ -14,15 +14,21 @@ class DummySerializerTests(unittest.TestCase):
 
 class SerializerTests(unittest.TestCase):
     class Klass():
-        attribute = 'value'
-    o = Klass()
+        attribute = None
 
-    def test_single_str_attr(self):
+    o = Klass()
+    o.attribute = 'value'
+
+    def test_serialize_single_str_attr(self):
         s = jsonify.serialize(self.o)
         self.assertEquals(s, '{"klass": {"attribute": "value"}}')
 
-class DeserializerTests(unittest.TestCase):
-    pass
+    def test_deserialize_single_str_attr(self):
+        s = '{"klass": {"attribute": "value"}}'
+        o = jsonify.deserialize(s, self.Klass)
+        self.assertTrue(isinstance(o, self.Klass))
+        self.assertEquals(o.attribute, 'value')
+
 
 class DecoratorTests(unittest.TestCase):
     pass
