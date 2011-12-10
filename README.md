@@ -1,7 +1,7 @@
 Relish: Python Object Serialization
 ===================================
 
-Serialize attributes of your python objects into tasty (human-readable) formats.
+Serialize your python objects into tasty (human-readable) formats.
 
 - Serialize your python object models to/from JSON, YAML or XML.
 - Customize the appearance of the serialized data, e.g. for RESTful consumption.
