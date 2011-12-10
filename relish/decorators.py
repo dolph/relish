@@ -4,7 +4,12 @@
 def relish(*args, **kwargs):
     def decorator(obj):
         def wrapper():
-            obj._relish = kwargs
-            return obj()
-        return wrapper
+            try:
+                obj._relish
+            except AttributeError:
+                obj._relish = {}
+
+            obj._relish.update(**kwargs)
+            return obj
+        return wrapper()
     return decorator

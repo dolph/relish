@@ -14,14 +14,34 @@ def deserialize(string, cls):
     obj = _dict_to_obj(d, cls)
     return obj
 
+def _get_wrapper_name(cls):
+    if hasattr(cls, '_relish'):
+        name = cls._relish.get('name')
+    else:
+        name = cls.__name__.lower()
+
+    if name:
+        name.lower()
+
+    return name
+
 def _wrap_dict(obj, d):
     """Wrap a dictionary with the class name."""
-    return {obj.__class__.__name__.lower(): d}
+    name = _get_wrapper_name(obj.__class__)
+
+    if name:
+        return {name: d}
+    else:
+        return d
 
 def _unwrap_dict(d, cls):
     """Unwrap the class name from the dictionary"""
-    assert len(d.keys()) == 1
-    return d.get(cls.__name__.lower())
+    name = _get_wrapper_name(cls)
+
+    if name:
+        return d.get(name)
+    else:
+        return d
 
 def _obj_to_dict(obj):
     """Walk an object and produce a corresponding dictionary.

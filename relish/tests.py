@@ -46,10 +46,28 @@ class JsonSerializerTests(unittest.TestCase):
 
 class DecoratorTests(unittest.TestCase):
     @relish(name='class')
+    @relish(attribute={'name': 'value'})
     class Klass():
         attribute = None
 
     o = Klass()
 
+    @relish(name=None)
+    class Nameless():
+        attribute = None
+
+    anon = Nameless()
+    anon.attribute = 7
+
     def test_class_decorator(self):
-        self.assertEqual(self.o._relish, {'name': 'class'})
+        self.assertEqual(self.o._relish, {'name': 'class', 'attribute': {'name': 'value'}})
+
+    def test_serializing_unwrapped_class(self):
+        s = jsonify.serialize(self.anon)
+        self.assertEquals(s, '{"attribute": 7}')
+
+    def test_deserializing_unwrapped_class(self):
+        s = '{"attribute": 7}'
+        o = jsonify.deserialize(s, self.Nameless)
+        self.assertTrue(isinstance(o, self.Nameless))
+        self.assertEquals(o.attribute, 7)
