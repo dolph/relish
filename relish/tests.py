@@ -1,8 +1,8 @@
 import unittest
 
-from serializers import dummify
-from serializers import jsonify
-
+from relish.serializers import dummify
+from relish.serializers import jsonify
+from relish.decorators import relish
 
 class DummySerializerTests(unittest.TestCase):
     def test_dummy_serializer(self):
@@ -45,4 +45,11 @@ class JsonSerializerTests(unittest.TestCase):
 
 
 class DecoratorTests(unittest.TestCase):
-    pass
+    @relish(name='class')
+    class Klass():
+        attribute = None
+
+    o = Klass()
+
+    def test_class_decorator(self):
+        self.assertEqual(self.o._relish, {'name': 'class'})
